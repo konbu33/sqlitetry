@@ -52,7 +52,12 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(color: Colors.white, fontSize: 50),
                       ),
                       trailing: CupertinoSwitch(
-                          value: true, onChanged: (newValue) {}),
+                          value: alarm.isActive,
+                          onChanged: (newValue) {
+                            setState(() {
+                              alarm.isActive = newValue;
+                            });
+                          }),
                     ),
                     Divider(color: Colors.grey, height: 0),
                   ],
