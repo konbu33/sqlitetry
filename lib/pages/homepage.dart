@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sqlitetry/alarm.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:sqlitetry/pages/add_edit_alarm_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -35,7 +36,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
             trailing: GestureDetector(
               child: Icon(Icons.add, color: Colors.orange),
-              onTap: () => print("test"),
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddEditAlarmPage())),
             ),
           ),
           SliverList(
