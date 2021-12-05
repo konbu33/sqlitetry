@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqlitetry/alarm.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [
     Alarm(alarmTime: DateTime.now()),
     Alarm(alarmTime: DateTime.now()),
@@ -18,6 +19,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Flutter_Slidable 1.0.0 not implement controller? not controll exclusive?
+    // SlidableController _slidableController = SlidableController(this);
     return Scaffold(
       backgroundColor: Colors.black,
       body: CustomScrollView(
@@ -46,18 +49,29 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.grey,
                         height: 1,
                       ),
-                    ListTile(
-                      title: Text(
-                        DateFormat("H:mm").format(alarm.alarmTime),
-                        style: TextStyle(color: Colors.white, fontSize: 50),
+                    Slidable(
+                      endActionPane:
+                          ActionPane(motion: ScrollMotion(), children: [
+                        SlidableAction(
+                          icon: Icons.delete,
+                          label: "削除",
+                          backgroundColor: Colors.red,
+                          onPressed: (context) {},
+                        )
+                      ]),
+                      child: ListTile(
+                        title: Text(
+                          DateFormat("H:mm").format(alarm.alarmTime),
+                          style: TextStyle(color: Colors.white, fontSize: 50),
+                        ),
+                        trailing: CupertinoSwitch(
+                            value: alarm.isActive,
+                            onChanged: (newValue) {
+                              setState(() {
+                                alarm.isActive = newValue;
+                              });
+                            }),
                       ),
-                      trailing: CupertinoSwitch(
-                          value: alarm.isActive,
-                          onChanged: (newValue) {
-                            setState(() {
-                              alarm.isActive = newValue;
-                            });
-                          }),
                     ),
                     Divider(color: Colors.grey, height: 0),
                   ],
