@@ -13,10 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  List<Alarm> alarmList = [
-    Alarm(alarmTime: DateTime.now()),
-    Alarm(alarmTime: DateTime.now()),
-  ];
+  List<Alarm> alarmList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +32,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             trailing: GestureDetector(
-              child: Icon(Icons.add, color: Colors.orange),
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddEditAlarmPage())),
-            ),
+                child: Icon(Icons.add, color: Colors.orange),
+                onTap: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              AddEditAlarmPage(alarmList: alarmList)));
+                  setState(() {
+                    alarmList
+                        .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
+                  });
+                }),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(

@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sqlitetry/alarm.dart';
 
 class AddEditAlarmPage extends StatefulWidget {
-  const AddEditAlarmPage({Key? key}) : super(key: key);
+  AddEditAlarmPage({Key? key, required this.alarmList}) : super(key: key);
 
+  List<Alarm> alarmList;
   @override
   _AddEditAlarmPageState createState() => _AddEditAlarmPageState();
 }
@@ -12,6 +14,7 @@ class AddEditAlarmPage extends StatefulWidget {
 class _AddEditAlarmPageState extends State<AddEditAlarmPage> {
   TextEditingController _controller = TextEditingController();
   DateTime selectedDate = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +36,14 @@ class _AddEditAlarmPageState extends State<AddEditAlarmPage> {
         ),
         actions: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: () {
+              Alarm alarm = Alarm(
+                  alarmTime: DateTime(
+                      2000, 1, 1, selectedDate.hour, selectedDate.minute));
+              widget.alarmList.add(alarm);
+              // setState(() {});
+              Navigator.pop(context);
+            },
             child: Container(
               padding: EdgeInsets.only(right: 20),
               alignment: Alignment.center,
