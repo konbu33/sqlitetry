@@ -78,6 +78,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 alarm.isActive = newValue;
                               });
                             }),
+                        onTap: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddEditAlarmPage(
+                                      alarmList: alarmList, index: index)));
+                          // setState(() {
+                          //   alarmList.sort(
+                          //       (a, b) => a.alarmTime.compareTo(b.alarmTime));
+                          // });
+                        },
                       ),
                     ),
                     Divider(color: Colors.grey, height: 0),
