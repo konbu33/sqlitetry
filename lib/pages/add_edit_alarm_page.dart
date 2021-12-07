@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sqlitetry/alarm.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqlitetry/sqflite.dart';
 
 class AddEditAlarmPage extends StatefulWidget {
   AddEditAlarmPage({Key? key, required this.alarmList, this.index})
@@ -52,14 +54,14 @@ class _AddEditAlarmPageState extends State<AddEditAlarmPage> {
         ),
         actions: [
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               Alarm alarm = Alarm(
                   alarmTime: DateTime(
                       2000, 1, 1, selectedDate.hour, selectedDate.minute));
               if (widget.index != null) {
                 widget.alarmList[widget.index!] = alarm;
               } else {
-                widget.alarmList.add(alarm);
+                await DbProvider.insertData(alarm);
               }
               // setState(() {});
               widget.alarmList
