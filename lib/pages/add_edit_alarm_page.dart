@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:sqlitetry/alarm.dart';
 
 class AddEditAlarmPage extends StatefulWidget {
-  AddEditAlarmPage({Key? key, required this.alarmList}) : super(key: key);
+  AddEditAlarmPage({Key? key, required this.alarmList, this.index})
+      : super(key: key);
 
   List<Alarm> alarmList;
+  final int? index;
   @override
   _AddEditAlarmPageState createState() => _AddEditAlarmPageState();
 }
@@ -14,6 +16,20 @@ class AddEditAlarmPage extends StatefulWidget {
 class _AddEditAlarmPageState extends State<AddEditAlarmPage> {
   TextEditingController _controller = TextEditingController();
   DateTime selectedDate = DateTime.now();
+
+  void initEditAlarm() {
+    if (widget.index != null) {
+      selectedDate = widget.alarmList[widget.index!].alarmTime;
+      _controller.text = DateFormat("H:mm").format(selectedDate);
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initEditAlarm();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +56,14 @@ class _AddEditAlarmPageState extends State<AddEditAlarmPage> {
               Alarm alarm = Alarm(
                   alarmTime: DateTime(
                       2000, 1, 1, selectedDate.hour, selectedDate.minute));
-              widget.alarmList.add(alarm);
+              if (widget.index != null) {
+                widget.alarmList[widget.index!] = alarm;
+              } else {
+                widget.alarmList.add(alarm);
+              }
               // setState(() {});
+              widget.alarmList
+                  .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
               Navigator.pop(context);
             },
             child: Container(
