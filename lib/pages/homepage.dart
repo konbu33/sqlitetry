@@ -4,6 +4,8 @@ import 'package:sqlitetry/alarm.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlitetry/pages/add_edit_alarm_page.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqlitetry/sqflite.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,6 +16,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
+  Future<void> initDb() async {
+    await DbProvider.setDb();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initDb();
+  }
 
   @override
   Widget build(BuildContext context) {
