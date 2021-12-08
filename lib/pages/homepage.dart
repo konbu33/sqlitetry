@@ -18,6 +18,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
   Future<void> initDb() async {
     await DbProvider.setDb();
+    alarmList = await DbProvider.getData();
+    setState(() {});
+  }
+
+  Future<void> reBuild() async {
+    alarmList = await DbProvider.getData();
+    alarmList.sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
     setState(() {});
   }
 
@@ -52,10 +59,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       MaterialPageRoute(
                           builder: (context) =>
                               AddEditAlarmPage(alarmList: alarmList)));
-                  setState(() {
-                    alarmList
-                        .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
-                  });
+                  reBuild();
+                  // setState(() {
+                  //   alarmList
+                  //       .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
+                  // });
                 }),
           ),
           SliverList(
@@ -100,6 +108,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               MaterialPageRoute(
                                   builder: (context) => AddEditAlarmPage(
                                       alarmList: alarmList, index: index)));
+                          reBuild();
                           // setState(() {
                           //   alarmList.sort(
                           //       (a, b) => a.alarmTime.compareTo(b.alarmTime));
