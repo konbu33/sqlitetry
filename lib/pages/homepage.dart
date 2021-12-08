@@ -6,6 +6,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlitetry/pages/add_edit_alarm_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqlitetry/sqflite.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
+  Timer? _timer;
   Future<void> initDb() async {
     await DbProvider.setDb();
     alarmList = await DbProvider.getData();
@@ -33,6 +35,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // TODO: implement initState
     super.initState();
     initDb();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      print("定期実行");
+    });
   }
 
   @override
