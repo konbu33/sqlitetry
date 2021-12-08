@@ -7,6 +7,7 @@ import 'package:sqlitetry/pages/add_edit_alarm_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqlitetry/sqflite.dart';
 import 'dart:async';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
   Timer? _timer;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   Future<void> initDb() async {
     await DbProvider.setDb();
     alarmList = await DbProvider.getData();
@@ -30,13 +33,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  void notification() {
+    _flutterLocalNotificationsPlugin.initialize(
+      InitializationSettings(
+        android: AndroidInitializationSettings('ic_launcher'),
+        iOS: IOSInitializationSettings(),
+      ),
+    );
+    _flutterLocalNotificationsPlugin.show(
+        1,
+        'アラーム',
+        "時間になりました。",
+        NotificationDetails(
+          android: AndroidNotificationDetails('id', 'name',
+              importance: Importance.max, priority: Priority.high),
+          iOS: IOSNotificationDetails(),
+        ));
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     initDb();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      print("定期実行");
+      // print("定期実行");
+      notification();
     });
   }
 
