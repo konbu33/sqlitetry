@@ -84,9 +84,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           icon: Icons.delete,
                           label: "削除",
                           backgroundColor: Colors.red,
-                          onPressed: (context) {
-                            alarmList.removeAt(index);
-                            setState(() {});
+                          onPressed: (context) async {
+                            await DbProvider.deleteData(alarm.id);
+                            reBuild();
                           },
                         )
                       ]),
