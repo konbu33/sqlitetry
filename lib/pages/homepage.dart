@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
   Timer? _timer;
+  DateTime _time = DateTime.now();
+
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   Future<void> initDb() async {
@@ -58,7 +60,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     initDb();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       // print("定期実行");
-      notification();
+      _time = _time.add(Duration(seconds: 1));
+      alarmList.forEach((alarm) {
+        if (alarm.isActive == true &&
+            alarm.alarmTime.hour == _time.hour &&
+            alarm.alarmTime.minute == _time.minute &&
+            _time.second == 0) {
+          notification();
+        }
+      });
     });
   }
 
