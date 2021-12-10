@@ -8,6 +8,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqlitetry/sqflite.dart';
 import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,7 +19,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
-  Timer? _timer;
   DateTime _time = DateTime.now();
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -35,8 +35,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void notification() {
-    _flutterLocalNotificationsPlugin.initialize(
+  void initializeNotification() {
+    _flutterLocalNotificationsPlugin.initialize(InitializationSettings(
+      android: AndroidInitializationSettings('ic_launcher'),
+      iOS: IOSInitializationSettings(),
+    ));
+  }
+
+  void setNotification(int id) {
+    _flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        "アラーム",
+        '時間になりました。',
+        tz.TZDateTime.now(tz.local).add(Duration(seconds: 3)),
+        NotificationDetails(
+          android: AndroidNotificationDetails('id', 'name',
+              importance: Importance.max, priority: Priority.high),
+          iOS: IOSNotificationDetails(),
+        ),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidAllowWhileIdle: true);
+  }
+
+  void notification() async {
+    await _flutterLocalNotificationsPlugin.initialize(
       InitializationSettings(
         android: AndroidInitializationSettings('ic_launcher'),
         iOS: IOSInitializationSettings(),
@@ -55,21 +78,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initDb();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      // print("定期実行");
-      _time = _time.add(Duration(seconds: 1));
-      alarmList.forEach((alarm) {
-        if (alarm.isActive == true &&
-            alarm.alarmTime.hour == _time.hour &&
-            alarm.alarmTime.minute == _time.minute &&
-            _time.second == 0) {
-          notification();
-        }
-      });
-    });
+    initializeNotification();
   }
 
   @override
@@ -97,6 +108,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           builder: (context) =>
                               AddEditAlarmPage(alarmList: alarmList)));
                   reBuild();
+                  setNotification(0);
                   // setState(() {
                   //   alarmList
                   //       .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));

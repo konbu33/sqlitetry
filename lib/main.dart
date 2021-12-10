@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:timezone/data/latest_10y.dart';
 import 'pages/homepage.dart';
+import 'package:timezone/timezone.dart';
 
 void main() {
+  initializeTimeZones();
+  setLocalLocation(getLocation('Asia/Tokyo'));
   runApp(const MyApp());
 }
 
