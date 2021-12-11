@@ -42,12 +42,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ));
   }
 
-  void setNotification(int id) {
+  void setNotification(int id, DateTime alarmTime) {
     _flutterLocalNotificationsPlugin.zonedSchedule(
         id,
         "アラーム",
         '時間になりました。',
-        tz.TZDateTime.now(tz.local).add(Duration(seconds: 3)),
+        tz.TZDateTime.from(alarmTime, tz.local),
         NotificationDetails(
           android: AndroidNotificationDetails('id', 'name',
               importance: Importance.max, priority: Priority.high),
@@ -102,13 +102,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             trailing: GestureDetector(
                 child: Icon(Icons.add, color: Colors.orange),
                 onTap: () async {
-                  await Navigator.push(
+                  Alarm result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
                               AddEditAlarmPage(alarmList: alarmList)));
-                  reBuild();
-                  setNotification(0);
+                  if (result != null) {
+                    reBuild();
+                    setNotification(result.id, result.alarmTime);
+                  }
                   // setState(() {
                   //   alarmList
                   //       .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));

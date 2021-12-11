@@ -55,19 +55,27 @@ class _AddEditAlarmPageState extends State<AddEditAlarmPage> {
         actions: [
           GestureDetector(
             onTap: () async {
-              Alarm alarm = Alarm(
-                  alarmTime: DateTime(
-                      2000, 1, 1, selectedDate.hour, selectedDate.minute));
+              DateTime now = DateTime.now();
+              DateTime alarmTime;
+              if (now.compareTo(selectedDate) == -1) {
+                alarmTime = DateTime(selectedDate.year, selectedDate.month,
+                    selectedDate.day, selectedDate.hour, selectedDate.minute);
+              } else {
+                alarmTime = DateTime(now.year, now.month, now.day + 1,
+                    selectedDate.hour, selectedDate.minute);
+              }
+              Alarm alarm = Alarm(alarmTime: alarmTime);
               if (widget.index != null) {
                 alarm.id = widget.alarmList[widget.index!].id;
                 await DbProvider.updateData(alarm);
               } else {
-                await DbProvider.insertData(alarm);
+                int id = await DbProvider.insertData(alarm);
+                alarm.id = id;
               }
               // setState(() {});
               widget.alarmList
                   .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
-              Navigator.pop(context);
+              Navigator.pop(context, alarm);
             },
             child: Container(
               padding: EdgeInsets.only(right: 20),
