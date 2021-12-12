@@ -6,6 +6,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlitetry/pages/add_edit_alarm_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqlitetry/sqflite.dart';
+import 'dart:async';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,6 +19,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Alarm> alarmList = [];
+  DateTime _time = DateTime.now();
+
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   Future<void> initDb() async {
     await DbProvider.setDb();
     alarmList = await DbProvider.getData();
@@ -28,11 +35,52 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  void initializeNotification() {
+    _flutterLocalNotificationsPlugin.initialize(InitializationSettings(
+      android: AndroidInitializationSettings('ic_launcher'),
+      iOS: IOSInitializationSettings(),
+    ));
+  }
+
+  void setNotification(int id, DateTime alarmTime) {
+    _flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        "アラーム",
+        '時間になりました。',
+        tz.TZDateTime.from(alarmTime, tz.local),
+        NotificationDetails(
+          android: AndroidNotificationDetails('id', 'name',
+              importance: Importance.max, priority: Priority.high),
+          iOS: IOSNotificationDetails(),
+        ),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidAllowWhileIdle: true);
+  }
+
+  void notification() async {
+    await _flutterLocalNotificationsPlugin.initialize(
+      InitializationSettings(
+        android: AndroidInitializationSettings('ic_launcher'),
+        iOS: IOSInitializationSettings(),
+      ),
+    );
+    _flutterLocalNotificationsPlugin.show(
+        1,
+        'アラーム',
+        "時間になりました。",
+        NotificationDetails(
+          android: AndroidNotificationDetails('id', 'name',
+              importance: Importance.max, priority: Priority.high),
+          iOS: IOSNotificationDetails(),
+        ));
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initDb();
+    initializeNotification();
   }
 
   @override
@@ -54,12 +102,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             trailing: GestureDetector(
                 child: Icon(Icons.add, color: Colors.orange),
                 onTap: () async {
-                  await Navigator.push(
+                  Alarm result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
                               AddEditAlarmPage(alarmList: alarmList)));
-                  reBuild();
+                  if (result != null) {
+                    reBuild();
+                    setNotification(result.id, result.alarmTime);
+                  }
                   // setState(() {
                   //   alarmList
                   //       .sort((a, b) => a.alarmTime.compareTo(b.alarmTime));
